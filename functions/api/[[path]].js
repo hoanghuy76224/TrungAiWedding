@@ -13,11 +13,12 @@ export async function onRequest({request:req,env,params}){
 try{
 const path=Array.isArray(params.path)?params.path.join('/'):params.path;
 if(path==='config'&&req.method==='GET'){const r=await env.ASSETS.fetch(new URL('/music.mp3',req.url),{method:'HEAD'});return json({music:r.ok&&r.headers.get('content-type')?.startsWith('audio/')?'/music.mp3':null});}
-if(!env.DB||!env.ADMIN_PASSWORD||env.ADMIN_PASSWORD.length<16)return json({error:'Thiệp chưa được kết nối dữ liệu. Vui lòng thử lại sau.'},503);
+if(!env.DB)return json({error:'Thiệp chưa được kết nối dữ liệu. Vui lòng thử lại sau.'},503);
 await init(env.DB);
 if(!['GET','HEAD'].includes(req.method)){const origin=req.headers.get('Origin');if(origin!==new URL(req.url).origin)return json({error:'Yêu cầu không hợp lệ.'},403);}
-const ipHash=await sign(req.headers.get('CF-Connecting-IP')||'unknown',env.ADMIN_PASSWORD);
+const ipHash=await sign(req.headers.get('CF-Connecting-IP')||'unknown',env.ADMIN_PASSWORD||'trungaiwedding-rsvp-rate-v1');
 if(path==='login'&&req.method==='POST'){
+if(!env.ADMIN_PASSWORD||env.ADMIN_PASSWORD.length<16)return json({error:'Chưa đặt mật khẩu quản trị trên máy chủ.'},503);
 if(!await rate(env.DB,'login:'+ipHash,12))return json({error:'Bạn đã thử quá nhiều lần. Vui lòng thử lại sau.'},429);
 const d=await body(req);if(!await equal(String(d.password||''),env.ADMIN_PASSWORD))return json({error:'Mật khẩu chưa đúng.'},401);
 const exp=String(Date.now()+21600000),token=exp+'.'+await sign(exp,env.ADMIN_PASSWORD);
@@ -32,6 +33,7 @@ const id=crypto.randomUUID();await env.DB.prepare('INSERT INTO rsvp(id,guestName
 }
 if(path==='wishes'&&req.method==='GET'){const r=await env.DB.prepare("SELECT guestName AS name,wish FROM rsvp WHERE hidden=0 AND length(trim(wish))>0 ORDER BY createdAt DESC LIMIT 100").all();return json(r.results);}
 if(path==='admin'){
+if(!env.ADMIN_PASSWORD||env.ADMIN_PASSWORD.length<16)return json({error:'Chưa đặt mật khẩu quản trị trên máy chủ.'},503);
 if(!await isAdmin(req,env))return json({error:'Vui lòng đăng nhập quản trị.'},401);
 if(req.method==='GET'){const r=await env.DB.prepare('SELECT id,guestName,invitedAs,attend,side,numGuest,wish,createdAt FROM rsvp WHERE hidden=0 ORDER BY createdAt DESC LIMIT 10000').all();return json(r.results);}
 if(req.method==='DELETE'){const d=await body(req);if(!/^[a-f0-9-]{36}$/.test(d.id||''))return json({error:'Mã không hợp lệ.'},400);await env.DB.prepare('UPDATE rsvp SET hidden=1 WHERE id=?').bind(d.id).run();return json({ok:true});}
