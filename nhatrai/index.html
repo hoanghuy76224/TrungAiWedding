@@ -595,7 +595,7 @@ body.adm-on #lang-switch,body.adm-on #fx,body.adm-on #opening{display:none!impor
 <style>
 :root{--pink-50:#dce6ee;--pink-100:#e8eff4;--pink-200:#c9d9e6;--pink-300:#a9c2d4;--pink-400:#7d9aaf;--pink-500:#5b6266;--pink-600:#464c51;--wine:#3e4448;--ink:#3e4448;--cream:#f3f7fa;--gold:#a9c2d4;--red:#3e4448;--shadow:0 20px 50px -20px rgba(60,90,115,.25)}
 [data-en],#lang-switch{display:none!important}body{background:#dce6ee}.bp-body{background:#f3f7fa}.welcome-card{max-width:500px;width:min(100vw,calc(100svh * 2 / 3));aspect-ratio:2/3}.welcome-card>img{filter:brightness(.53);object-position:center}.new-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;padding:20px}.new-cover h1{font-family:var(--script);font-weight:400;font-size:clamp(36px,10vw,62px);line-height:1.1;margin:24px 0}.new-cover h1 span{font-family:var(--serif);font-size:24px}.new-cover p{font-size:10px;letter-spacing:.2em}.new-cover .cover-date{font-family:var(--serif);font-size:25px;margin:20px 0}.new-cover .cover-guest{position:static;translate:none;white-space:normal;color:#fff;font-size:28px!important;margin-top:10px;animation:none}.tl-cap p+p{margin-top:12px}.tl-photo{aspect-ratio:4/5}.venue-name{white-space:normal!important}.pc-name{font-size:clamp(24px,6vw,36px)}.pc-photo .photo{object-position:50% 20%}.music-btn{background:#5b6266}.closing-names{flex-wrap:wrap}.hero-photo img{object-fit:contain;background:#c9d9e6}.hero-photo{height:auto!important;aspect-ratio:2/3!important}.bp-hall:empty{display:none}#opening{background:#dce6ee}a:focus-visible,button:focus-visible,[role=button]:focus-visible{outline:3px solid #6489a3;outline-offset:5px}input[name=side]{pointer-events:none}
-</style></head>
+</style><style>.new-cover h1{font-family:'DS Names',var(--script);font-size:clamp(34px,8vw,48px);font-feature-settings:'calt' 0,'liga' 0;font-variant-ligatures:none;line-height:1.25}.new-cover h1 br:nth-of-type(2){display:none}.new-cover h1 span{display:block;margin:10px 0}.welcome-card{overflow:hidden}.pc-role{font-size:.7rem}.tl-item::before,.tl-item::after{content:none!important}#music-btn:not([data-ready]){display:none!important}</style></head>
 <body class="locked" data-lang="vi">
 
 <!-- LANGUAGE SWITCH -->
@@ -795,7 +795,7 @@ opening.addEventListener('click',openInvite);opening.addEventListener('keydown',
   var bgm=document.getElementById('bgm');
   var btn=document.getElementById('music-btn');
   if(!bgm||!btn) return;
-  var wanted=true;fetch('/api/config').then(r=>r.json()).then(c=>{if(c.music){bgm.src=c.music;}}).catch(()=>{});
+  var wanted=true;fetch('/api/config').then(r=>r.json()).then(c=>{if(c.music){bgm.src=c.music;btn.dataset.ready='1';}}).catch(()=>{});
   function sync(){ btn.classList.toggle('muted', bgm.paused); btn.setAttribute('aria-pressed', String(!bgm.paused)); }
   function playMusic(){ if(!wanted||!bgm.getAttribute('src')) return; var p=bgm.play(); if(p&&p.catch){p.catch(function(){});} setTimeout(sync,80); }
   var _openInvite=openInvite;
@@ -941,7 +941,7 @@ syncPh(); document.querySelectorAll('#lang-switch button').forEach(b=>b.addEvent
   const thumbs=[...document.querySelectorAll('#al-thumbs img')];
   thumbs.forEach(th=>{if(th.dataset.ref)th.src=document.getElementById(th.dataset.ref).src;});
   const box=document.getElementById('al-thumbs'), track=document.getElementById('al-track'), m=document.getElementById('al-main');
-  thumbs.forEach(th=>{ const im=document.createElement('img'); im.alt=''; im.src=th.src; im.decoding='async'; track.appendChild(im); });
+  thumbs.forEach(th=>{ const im=document.createElement('img'); im.alt=th.alt; im.src=th.src; im.decoding='async'; im.loading='lazy'; track.appendChild(im); });
   const N=thumbs.length; let cur=0;
   function place(){ track.style.transform='translateX('+(-cur*100)+'%)'; }
   function show(i){
@@ -950,7 +950,7 @@ syncPh(); document.querySelectorAll('#lang-switch button').forEach(b=>b.addEvent
     thumbs.forEach((th,k)=>th.classList.toggle('on',k===cur));
     const th=thumbs[cur]; box.scrollTo({top:th.offsetTop-(box.clientHeight-th.clientHeight)/2,behavior:'smooth'});
   }
-  thumbs[0].classList.add('on'); place();
+  thumbs[0].classList.add('on'); track.firstElementChild.loading='eager'; place();
   thumbs.forEach((th,k)=>th.addEventListener('click',()=>show(k)));
   document.getElementById('al-prev').addEventListener('click',e=>{e.stopPropagation();show(cur-1);});
   document.getElementById('al-next').addEventListener('click',e=>{e.stopPropagation();show(cur+1);});
