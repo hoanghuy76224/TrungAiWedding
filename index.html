@@ -549,8 +549,8 @@ img{display:block;max-width:100%}
   'use strict';
   var WEDDING = new Date('2026-12-05T17:30:00+07:00');
   var SITE = 'https://aitrungwedding.khunglongcon.com/';
-  var ADMIN_UID = '5ERxT5mA2EQXkhHzXPIs2x8va8f2';
-  var ADMIN_EMAIL = 'trinhhoang-admin@vo-iu-dino-848d2.firebaseapp.com';
+  var ADMIN_UID = 'xzvC3WdEasMYlabGzRwwQACryk32';
+  var ADMIN_EMAIL = 'ngocaitrung-admin@vo-iu-dino-848d2.firebaseapp.com';
   var FIREBASE_CONFIG = {apiKey:"AIzaSyDKojhw5-SFWukGSN_oSjw5vxJngrfIogo",authDomain:"vo-iu-dino-848d2.firebaseapp.com",projectId:"vo-iu-dino-848d2",storageBucket:"vo-iu-dino-848d2.firebasestorage.app",messagingSenderId:"879023470388",appId:"1:879023470388:web:ecc9128f6f280b26249761"};
   var COL_G = 'guests_ngocaitrung';
   var $ = function(s){ return document.querySelector(s); };
@@ -759,7 +759,7 @@ img{display:block;max-width:100%}
     button.disabled=true;error.textContent='Đang kiểm tra mật khẩu…';
     ready.then(function(ok){
       if(!ok || !auth)throw new Error('offline');
-      return authApi.signInWithEmailAndPassword(auth,ADMIN_EMAIL,'trinhhoang-admin:'+password);
+      return authApi.signInWithEmailAndPassword(auth,ADMIN_EMAIL,'ngocaitrung-admin:'+password);
     }).then(function(){
       if(!isSiteAdmin())throw new Error('unauthorized');
       $('#pinIn').value='';error.textContent='';unlock();
